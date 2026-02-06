@@ -92,3 +92,184 @@ Test content
 **How Git stores data:**
 
 Git uses a **content-addressable storage** model. Each object (blob, tree, commit) is hashed (SHA-1), and the hash becomes its permanent ID. Git stores these objects in `.git/objects/`. The directed acyclic graph structure — where commits point to parents—creates the history chain. Because hashes are deterministic based on content, identical files share the same blob across commits and any tampering changes the hash.
+
+## Task 2 — Reset and Reflog Recovery
+
+[X] The exact commands you ran and why.
+
+[X] Snippets of git log --oneline and git reflog.
+
+[X] What changed in the working tree, index, and history for each reset.
+
+[X] Analysis of recovery process using reflog.
+
+
+### 2.1 Practice Branch Setup
+
+Created a practice branch with 3 commits:
+
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git switch -c git-reset-practice
+Переключились на новую ветку «git-reset-practice»
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
+  feature/lab1
+  feature/lab2
+* git-reset-practice
+  main
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % echo "First commit" > file.txt && git add file.txt && git commit -m "First commit"
+[git-reset-practice 8ba871d] First commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 file.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % echo "Second commit" >> file.txt && git add file.txt && git commit -m "Second commit"
+[git-reset-practice 0d0d8cf] Second commit
+ 1 file changed, 1 insertion(+)
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % echo "Third commit"  >> file.txt && git add file.txt && git commit -m "Third commit"
+[git-reset-practice 9a547b4] Third commit
+ 1 file changed, 1 insertion(+)
+```
+
+### 2.2 Reset Modes Explored
+
+**Initial state (before reset):**
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline
+9a547b4 (HEAD -> git-reset-practice) Third commit
+0d0d8cf Second commit
+8ba871d First commit
+08eabbe (feature/lab2) docs: task 1 - git object model exploration
+91caa5f Add test file
+97fa04a (origin/main, origin/HEAD, main) feat: add PR template
+d6b6a03 Update lab2
+87810a0 feat: remove old Exam Exemption Policy
+1e1c32b feat: update structure
+6c27ee7 feat: publish lecs 9 & 10
+1826c36 feat: update lab7
+3049f08 feat: publish lec8
+da8f635 feat: introduce all labs and revised structure
+04b174e feat: publish lab and lec #5
+67f12f1 feat: publish labs 4&5, revise others
+82d1989 feat: publish lab3 and lec3
+3f80c83 feat: publish lec2
+499f2ba feat: publish lab2
+af0da89 feat: update lab1
+74a8c27 Publish lab1
+f0485c0 Publish lec1
+31dd11b Publish README.md
+```
+
+**Test 1: git reset --soft HEAD~1**
+
+Command:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git reset --soft HEAD~1 
+```
+
+Status after soft reset:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
+Текущая ветка: git-reset-practice
+Изменения, которые будут включены в коммит:
+  (используйте «git restore --staged <файл>...», чтобы убрать из индекса)
+        изменено:      file.txt
+
+Изменения, которые не в индексе для коммита:
+  (используйте «git add <файл>...», чтобы добавить файл в индекс)
+  (используйте «git restore <файл>...», чтобы отменить изменения в рабочем каталоге)
+        изменено:      labs/submission2.md
+```
+
+Log after soft reset:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline -3
+0d0d8cf (HEAD -> git-reset-practice) Second commit
+8ba871d First commit
+08eabbe (feature/lab2) docs: task 1 - git object model exploration
+```
+
+**What changed:**
+1) HEAD moved from 9a547b4 → 0d0d8cf
+2) Index: Changes staged (file.txt modifications are in staging area)
+3) Working tree: Unchanged (file still contains all 3 lines)
+3) The "Third commit" is unreachable but still exists in reflog
+
+---
+
+**Test 2: git reset --hard HEAD~1**
+
+Command:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git reset --hard HEAD~1
+Указатель HEAD сейчас на коммите 8ba871d First commit
+```
+
+Log after hard reset:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline -3
+8ba871d (HEAD -> git-reset-practice) First commit
+08eabbe (feature/lab2) docs: task 1 - git object model exploration
+91caa5f Add test file
+```
+
+**What changed:**
+1) HEAD moved to 8ba871d
+2) Index: Cleared
+3) Working tree: Reverted to "First commit" state (file.txt has only "First commit" line)
+4) Both "Second commit" (0d0d8cf) and "Third commit" (9a547b4) are now unreachable
+
+---
+
+**Test 3: git reflog (Recovery)**
+
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git reflog
+8ba871d (HEAD -> git-reset-practice) HEAD@{0}: reset: moving to HEAD~1
+0d0d8cf HEAD@{1}: reset: moving to HEAD~1
+9a547b4 HEAD@{2}: commit: Third commit
+0d0d8cf HEAD@{3}: commit: Second commit
+8ba871d (HEAD -> git-reset-practice) HEAD@{4}: commit: First commit
+08eabbe (feature/lab2) HEAD@{5}: checkout: moving from feature/lab2 to git-reset-practice
+08eabbe (feature/lab2) HEAD@{6}: commit: docs: task 1 - git object model exploration
+91caa5f HEAD@{7}: commit: Add test file
+97fa04a (origin/main, origin/HEAD, main) HEAD@{8}: checkout: moving from main to feature/lab2
+97fa04a (origin/main, origin/HEAD, main) HEAD@{9}: checkout: moving from feature/lab1 to main
+e02372e (origin/feature/lab1, feature/lab1) HEAD@{10}: commit: docs: add lab1 submission
+43d9753 HEAD@{11}: commit: docs: add lab1 submission stub
+206c1df HEAD@{12}: checkout: moving from main to feature/lab1
+97fa04a (origin/main, origin/HEAD, main) HEAD@{13}: commit: feat: add PR template
+d6b6a03 HEAD@{14}: checkout: moving from feature/lab1 to main
+206c1df HEAD@{15}: commit: docs: add commit signing summary
+0a558e3 HEAD@{16}: commit: docs: add commit signing summary
+d6b6a03 HEAD@{17}: checkout: moving from main to feature/lab1
+d6b6a03 HEAD@{18}: clone: from https://github.com/mnkhmtv/DevOps-Intro.git
+```
+
+Recovery command:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git reset --hard 9a547b4
+Указатель HEAD сейчас на коммите 9a547b4 Third commit
+```
+
+Log after recovery:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline -3
+9a547b4 (HEAD -> git-reset-practice) Third commit
+0d0d8cf Second commit
+8ba871d First commit
+```
+
+**Result:** The lost commits are recovered
+
+### 2.3 Analysis
+
+**Reset modes explained:**
+
+**`--soft`:** Moves HEAD to the target commit, but keeps the index and working tree intact. Useful when you want to restructure commits — you can keep your changes staged and recommit them differently.
+
+**`--hard`:** Moves HEAD, clears the index, and reverts the working tree to match the target commit. Everything is discarded. Use with caution, but remember: nothing is truly lost while it's in reflog.
+
+**`--mixed` (default):** Moves HEAD and clears the index, but keeps working tree changes. Useful for unstaging changes without losing them.
+
+**Reflog rescue:**
+
+Git's reflog keeps a record of HEAD movements for ~90 days. Even after `git reset --hard`, commits aren't deleted immediately—they become orphaned (unreachable from any branch). Reflog lets you recover them by resetting to their hash. This is why reflog is essential: it's your safety net for accidental history rewrites. Always check reflog before panicking!
+

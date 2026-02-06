@@ -1,7 +1,7 @@
 # Lab 1 Submission — Version Control & Advanced Git
 
 **Student:** Diana Minnakhmetova
-**Date:** 06-02-2026
+**Date:** 07-02-2026
 
 ---
 
@@ -192,7 +192,6 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline -3
 3) Working tree: Unchanged (file still contains all 3 lines)
 3) The "Third commit" is unreachable but still exists in reflog
 
----
 
 **Test 2: git reset --hard HEAD~1**
 
@@ -216,7 +215,6 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git log --oneline -3
 3) Working tree: Reverted to "First commit" state (file.txt has only "First commit" line)
 4) Both "Second commit" (0d0d8cf) and "Third commit" (9a547b4) are now unreachable
 
----
 
 **Test 3: git reflog (Recovery)**
 
@@ -431,8 +429,6 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
 Toggling back to previous branch:
 ```bash
 dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git switch -
-Toggling back to previous branch:
-```bash
 Переключились на ветку «feature/lab2»
 dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
   cmd-compare
@@ -443,12 +439,12 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
   side-branch
 ```
 
----
 
 **Option B: git checkout (Legacy - Overloaded)**
 
 Creating and switching with legacy command:
 ```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git checkout -b cmd-compare-2
 Переключились на новую ветку «cmd-compare-2»
 dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
   cmd-compare
@@ -462,7 +458,6 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
 
 Note: `git checkout` can also be used for file operations (`git checkout -- <file>`), which makes it confusing. Modern Git separates concerns with `git switch` (branches) and `git restore` (files).
 
----
 
 **Option C: git restore (Modern - File Operations)**
 
@@ -511,7 +506,7 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
 ```
 
 
-Test 3 - Restore from another commit:
+Test 2 - Restore from another commit:
 ```bash
 dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore --staged demo.txt
 dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore --source=HEAD~1 demo.txt
@@ -556,3 +551,28 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
 
 **Best Practice:** Use `git switch` for branches and `git restore` for files. Avoid `git checkout` in new code—it's confusing and outdated.
 
+## Task 6 — GitHub Community Engagement
+
+### 6.1 Actions Completed
+
+[X] Starred the [course repository](https://github.com/inno-devops-labs/DevOps-Intro)
+
+[X] Starred [simple-container-com/api](https://github.com/simple-container-com/api)
+
+[X] Followed [@Cre-eD](https://github.com/Cre-eD) (Professor)
+
+[X] Followed [@marat-biriushev](https://github.com/marat-biriushev) (TA)
+
+[X] Followed [@pierrepicaud](https://github.com/pierrepicaud) (TA)
+
+[X] Followed 3 classmates on GitHub: [Arthur](https://github.com/ArthurBabkin), [Danis](https://github.com/DanisSharafiev), [Janna](https://github.com/iJeannne)
+
+### 6.2 GitHub Community Impact
+
+**Why starring matters in open source:**
+
+Stars serve as bookmarks for valuable projects and signal community appreciation. A high star count indicates project quality, maturity, and adoption—helping others discover reliable tools. Starring shows you actively evaluate open-source work and respect maintainers' efforts. On your GitHub profile, stars demonstrate awareness of industry best practices and quality tools relevant to your tech stack.
+
+**How following developers helps:**
+
+Following developers keeps you informed about their projects, contributions, and professional growth. In team collaborations, it builds awareness of teammates' interests and work patterns. Professionally, it expands your network, helps you discover emerging trends, and connects you with thought leaders in your field. Following classmates strengthens your learning community and makes it easier to find future project partners.

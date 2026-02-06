@@ -401,3 +401,158 @@ To https://github.com/mnkhmtv/DevOps-Intro.git
 ### 4.3 Why Tags Matter
 
 Tags mark specific points in history for releases and versioning. CI/CD pipelines often trigger builds on new tags, automating deployment workflows. Tags make it easy to find release versions without scrolling through hundreds of commits. They also improve discoverability on GitHub—each release gets its own "Release" page with downloads and release notes. Tags are essential for semantic versioning (v1.0.0, v1.1.0, etc.) and help teams quickly identify which code corresponds to which production version.
+
+
+## Task 5 — git switch vs checkout vs restore
+
+[X] Commands you ran and their outputs.
+
+[X] git status/git branch outputs showing state changes.
+
+[X] 2–3 sentences on when to use each command.
+
+### 5.1 Commands Tested
+
+**Option A: git switch (Modern - Recommended)**
+
+Creating and switching to a branch:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git switch -c cmd-compare
+Переключились на новую ветку «cmd-compare»
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
+* cmd-compare
+  feature/lab1
+  feature/lab2
+  git-reset-practice
+  main
+  side-branch
+```
+
+Toggling back to previous branch:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git switch -
+Toggling back to previous branch:
+```bash
+Переключились на ветку «feature/lab2»
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
+  cmd-compare
+  feature/lab1
+* feature/lab2
+  git-reset-practice
+  main
+  side-branch
+```
+
+---
+
+**Option B: git checkout (Legacy - Overloaded)**
+
+Creating and switching with legacy command:
+```bash
+Переключились на новую ветку «cmd-compare-2»
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git branch
+  cmd-compare
+* cmd-compare-2
+  feature/lab1
+  feature/lab2
+  git-reset-practice
+  main
+  side-branch
+```
+
+Note: `git checkout` can also be used for file operations (`git checkout -- <file>`), which makes it confusing. Modern Git separates concerns with `git switch` (branches) and `git restore` (files).
+
+---
+
+**Option C: git restore (Modern - File Operations)**
+
+Setup - create test file:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % echo "Demo code" > demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git add demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git commit -m "Add demo file"
+[feature/lab2 501507e] Add demo file
+ 1 file changed, 1 insertion(+)
+ create mode 100644 demo.txt
+```
+
+Test 1 - Discard working tree changes:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % echo "scratch" >> demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % cat demo.txt
+Demo code
+scratch
+
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
+Текущая ветка: feature/lab2
+Изменения, которые не в индексе для коммита:
+  (используйте «git add <файл>...», чтобы добавить файл в индекс)
+  (используйте «git restore <файл>...», чтобы отменить изменения в рабочем каталоге)
+        изменено:      demo.txt
+
+Неотслеживаемые файлы:
+  (используйте «git add <файл>...», чтобы добавить в то, что будет включено в коммит)
+        .DS_Store
+
+индекс пуст (используйте «git add» и/или «git commit -a»)
+
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % cat demo.txt
+Demo code
+
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
+Текущая ветка: feature/lab2
+Неотслеживаемые файлы:
+  (используйте «git add <файл>...», чтобы добавить в то, что будет включено в коммит)
+        .DS_Store
+
+индекс пуст, но есть неотслеживаемые файлы
+(используйте «git add», чтобы проиндексировать их)
+```
+
+
+Test 3 - Restore from another commit:
+```bash
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore --staged demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore --source=HEAD~1 demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % cat demo.txt
+cat: demo.txt: No such file or directory
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
+Текущая ветка: feature/lab2
+Изменения, которые не в индексе для коммита:
+  (используйте «git add/rm <файл>...», чтобы добавить или удалить файл из индекса)
+  (используйте «git restore <файл>...», чтобы отменить изменения в рабочем каталоге)
+        удалено:       demo.txt
+
+Неотслеживаемые файлы:
+  (используйте «git add <файл>...», чтобы добавить в то, что будет включено в коммит)
+        .DS_Store
+
+индекс пуст (используйте «git add» и/или «git commit -a»)
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git restore demo.txt
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % cat demo.txt
+
+Demo code
+dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git status
+Текущая ветка: feature/lab2
+Неотслеживаемые файлы:
+  (используйте «git add <файл>...», чтобы добавить в то, что будет включено в коммит)
+        .DS_Store
+
+индекс пуст, но есть неотслеживаемые файлы
+(используйте «git add», чтобы проиндексировать их)
+```
+
+### 5.2 When to Use Each Command
+
+**`git switch`:** Use for **branch operations only**. Modern, clear, and focused. Replaces `git checkout <branch>`. Examples: switching branches, creating new branches, toggling between two branches with `git switch -`.
+
+**`git checkout`:** Legacy command that does too many things (branches AND files). Still works, but avoid in new workflows. Only use if you're working with older team standards. The confusion between branch and file operations was why Git split this into `switch` and `restore`.
+
+**`git restore`:** Use for **file operations only**. Modern replacement for `git checkout -- <file>`. Three main uses:
+1) Discard working tree changes: `git restore <file>`
+2) Unstage without losing changes: `git restore --staged <file>`
+3) Restore from a specific commit: `git restore --source=<commit> <file>`
+
+**Best Practice:** Use `git switch` for branches and `git restore` for files. Avoid `git checkout` in new code—it's confusing and outdated.
+

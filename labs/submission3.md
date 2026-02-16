@@ -7,10 +7,13 @@
 
 ## Task 1: First GitHub Actions Workflow (6 pts)
 
-[X] GitHub Actions quickstart implemented
-[X] Workflow triggers on push automatically
-[X] Key concepts documented
-[X] Successful run with evidence
+[X] Link to the successful run.
+
+[X] Key concepts learned (jobs, steps, runners, triggers).
+
+[X] A short note on what caused the run to trigger.
+
+[X] Analysis of workflow execution process.
 
 ### 1.1 Workflow Implementation
 
@@ -113,10 +116,13 @@ dminnakhmetova@MacBook-Air-Diana-3 DevOps-Intro % git push -u origin feature/lab
 
 ## Task 2: Manual Trigger + System Information (4 pts)
 
-[X] Manual trigger (`workflow_dispatch`) configured
-[X] System information collected from actual runner
-[X] Push vs manual trigger comparison documented
-[X] Runner environment and capabilities analyzed
+[X] Changes made to the workflow file.
+
+[X] The gathered system information from runner.
+
+[X] Comparison of manual vs automatic workflow triggers.
+
+[X] Analysis of runner environment and capabilities.
 
 ### 2.1 Workflow Configuration for Manual Trigger
 
@@ -131,7 +137,7 @@ on:
 
 ### 2.2 Changes Made to Workflow File
 
-Added additional `environment_info` job to capture GitHub Actions environment variables:
+Added additional `environment_info` job to capture GitHub Actions environment variables (since I already made workflow_dispatch in previous task):
 
 ```yaml
 environment_info:
@@ -294,17 +300,6 @@ Excellent. Hardware provides ample resources for DevOps labs (CI/CD pipelines, c
 - Recovery/retry capability (re-run failed jobs without new commits)
 
 **In Practice:** Push triggers form the backbone of CI (Continuous Integration), while manual triggers enable flexible CD (Continuous Deployment) and operational workflows.
-```
-
----
-
-## Evidence & Artifacts
-
-**Run Links:**
-1. Push trigger: https://github.com/mnkhmtv/DevOps-Intro/actions/runs/22077087244
-2. Manual trigger: https://github.com/mnkhmtv/DevOps-Intro/actions/runs/22077650437
-
-```
 
 
 

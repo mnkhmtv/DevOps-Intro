@@ -1,0 +1,33 @@
+name: Lab 3 - CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, feature/lab3]
+  workflow_dispatch:
+
+jobs:
+  basic_info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Print basic info
+        run: |
+          echo "=== Workflow Started ==="
+          date
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+  
+  system_info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gather system information
+        run: |
+          echo "=== System Information ==="
+          uname -a
+          echo "---"
+          nproc
+          echo "---"
+          free -h
+          echo "---"
+          df -h

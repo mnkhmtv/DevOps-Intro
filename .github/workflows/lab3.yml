@@ -31,3 +31,18 @@ jobs:
           free -h
           echo "---"
           df -h
+  
+  environment_info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print environment variables
+        run: |
+          echo "=== GitHub Actions Environment ==="
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Runner Arch: ${{ runner.arch }}"
+          echo "Runner Name: ${{ runner.name }}"
+          echo "Python Version: $(python --version)"
+          echo "---"
+          echo "Workflow Trigger: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"

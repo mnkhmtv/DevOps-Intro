@@ -9,10 +9,14 @@
 
 ## Task 1 — Operating System Analysis (6 pts)
 
-All command outputs for sections 1.1-1.5.
-Key observations for each analysis section.
-Answer: "What is the top memory-consuming process?"
-Note any resource utilization patterns you observe.
+[X] All command outputs for sections 1.1-1.5.
+
+[X] Key observations for each analysis section.
+
+[X] Answer: "What is the top memory-consuming process?"
+
+[X] Note any resource utilization patterns you observe.
+
 ### 1.1 Boot Performance Analysis
 
 **Objective:** Analyze system boot time and current load metrics.
@@ -433,11 +437,15 @@ Memory:
 
 ## Task 2 — Networking Analysis (4 pts)
 
-All command outputs for sections 2.1-2.3.
-Insights on network paths discovered.
-Analysis of DNS query/response patterns.
-Comparison of reverse lookup results.
-One example DNS query from packet capture (sanitize IPs if needed).
+[X] All command outputs for sections 2.1-2.3.
+
+[X] Insights on network paths discovered.
+
+[X] Analysis of DNS query/response patterns.
+
+[X] Comparison of reverse lookup results.
+
+[X] One example DNS query from packet capture (sanitize IPs if needed).
 
 ### 2.1 Network Path Tracing
 
@@ -521,71 +529,33 @@ tcpdump: data link type PKTAP
 tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
 listening on any, link-type PKTAP (Apple DLT_PKTAP), snapshot length 524288 bytes
 16:22:21.796323 IP 10.240.21.XXX.49539 > 77.88.8.8.53: 61497+ A? gateway.fe2.apple-dns.net. (43)
-16:22:21.820508 IP 77.88.8.8.53 > 10.240.21.227.49539: 61497 4/0/0 A 17.248.214.12, A 17.248.214.69, A 17.248.214.70, A 17.248.214.68 (107)
+16:22:21.820508 IP 77.88.8.8.53 > 10.240.21.XXX.49539: 61497 4/0/0 A 17.248.214.12, A 17.248.214.69, A 17.248.214.70, A 17.248.214.68 (107)
 16:22:22.423531 IP 10.240.21.XXX.38498 > 81.22.204.35.53: 1136+ Type65? gator.volces.com. (34)
 16:22:22.423659 IP 10.240.21.XXX.47673 > 81.22.204.35.53: 56964+ A? gator.volces.com. (34)
-16:22:22.450117 IP 81.22.204.35.53 > 10.240.21.227.47673: 56964 10/0/0 CNAME gator.volces.com.bytedns1.com., CNAME gator.volces.com.230b2a2545cfa773.queniuck.com., A 163.181.0.226, A 163.181.0.224, A 163.181.0.229, A 163.181.0.227, A 163.181.0.231, A 163.181.0.225, A 163.181.0.230, A 163.181.0.228 (259)
+16:22:22.450117 IP 81.22.204.35.53 > 10.240.21.XXX.47673: 56964 10/0/0 CNAME gator.volces.com.bytedns1.com., CNAME gator.volces.com.230b2a2545cfa773.queniuck.com., A 163.181.0.226, A 163.181.0.224, A 163.181.0.229, A 163.181.0.227, A 163.181.0.231, A 163.181.0.225, A 163.181.0.230, A 163.181.0.228 (259)
 5 packets captured
 1646 packets received by filter
 0 packets dropped by kernel
 ```
 
 **DNS Query Example (Packet 1):**
+
 ```
-Query:  10.240.21.XXX.49539 > 77.88.8.8.53: 61497+ A? gateway.fe2.apple-dns.net.
-        ^client IP          ^DNS server    ^ID   ^recursion    ^hostname           ^size
-        
-Response: 77.88.8.8.53 > 10.240.21.XXX.49539: 61497 4/0/0 A 17.248.214.12, ...
-          ^DNS server returning 4 A records (4 IPs for the Apple gateway)
+16:22:21.796323 IP 10.240.21.XXX.49539 > 77.88.8.8.53: 61497+ A? gateway.fe2.apple-dns.net. (43)
 ```
 
-**Packet Capture Analysis:**
+**Explanation:**
+- **Source:** 10.240.21.XXX (your Mac's local IP address)
+- **Source port:** 49539 (ephemeral port assigned by your OS)
+- **Destination:** 77.88.8.8:53 (Yandex DNS resolver on port 53)
+- **Query ID:** 61497 (unique ID to match this query with its response)
+- **Flags:** `+` = recursion desired (ask DNS to look it up)
+- **Query type:** A (requesting IPv4 address)
+- **Domain:** gateway.fe2.apple-dns.net (Apple's DNS gateway)
+- **Message size:** 43 bytes
 
-**DNS Protocol Mechanics:**
-- **Protocol:** UDP (unreliable but fast, optimal for DNS)
-- **Port:** 53 (standard DNS port)
-- **Message ID:** 61497, 1136, 56964 (unique IDs to match queries with responses)
-- **Query types:** 
-  - **A** = IPv4 address (most common)
-  - **Type65** = DHCID (DHCP identifier, for lease tracking)
-
-**Captured Queries:**
-
-1. **Query 1-2 (gateway.fe2.apple-dns.net):**
-   - **Source:** 10.240.21.XXX (Mac)
-   - **Destination:** 77.88.8.8 (Yandex DNS)
-   - **Type:** A (IPv4 address)
-   - **Response:** 4 A records (4 IPs: 17.248.214.12, 17.248.214.69, 17.248.214.70, 17.248.214.68)
-   - **Purpose:** Load balancing — Apple's DNS gateway has 4 IPs, client receives all
-   - **Size:** Query 43 bytes, Response 107 bytes
-
-2. **Query 3-5 (gator.volces.com):**
-   - **Source:** 10.240.21.XXX (Mac)
-   - **Destination:** 81.22.204.35 (different DNS server — fallback resolver)
-   - **Type 1:** Type65 query (DHCP identifier)
-   - **Type 2:** A query (IPv4 address)
-   - **Response:** 10 records including:
-     - 2 CNAME entries (aliases pointing to other domains)
-     - 8 A records (actual IP addresses: 163.181.0.XXX range)
-   - **Size:** Larger response (259 bytes, 8 IPs)
-
-**Network Pattern Analysis:**
-
-| Metric | Value | Interpretation |
-|--------|-------|-----------------|
-| **Total packets captured** | 5 | Relatively low activity (background processes + system lookups) |
-| **Packets received by filter** | 1,646 | High volume of DNS traffic on network (many clients, many queries) |
-| **Packets dropped** | 0 | No packet loss (network clean, no overflow) |
-| **DNS servers contacted** | 2 (77.88.8.8, 81.22.204.35) | Fallback DNS — primary server may be unavailable for some queries |
-| **Query types** | A, Type65 | Mostly IPv4 + some DHCP queries |
-| **Response codes** | All successful (no errors shown) | Network DNS working correctly |
-
-**DNS Server Behavior:**
-- **Primary:** 77.88.8.8 (Yandex DNS) — handles Apple gateway queries
-- **Secondary:** 81.22.204.35 (fallback) — handles other domain queries
-- **Load balancing:** Multiple IPs returned for same domain (17.248.214.xxx range, 163.181.0.xxx range)
-- **Caching:** TTLs present but not visible in capture (would show in verbose mode)
-
+**What's happening:**  Mac asks Yandex DNS "What is the IP address for gateway.fe2.apple-dns.net?" The DNS server responds with 4 IP addresses (17.248.214.12, 17.248.214.69, 17.248.214.70, 17.248.214.68) for load balancing redundancy.
+```
 
 ### 2.3 Reverse DNS Lookups
 
